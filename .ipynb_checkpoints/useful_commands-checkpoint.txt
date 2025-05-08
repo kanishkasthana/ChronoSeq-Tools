@@ -1,0 +1,53 @@
+# For Copying and syncing files to Google Drive. Use rclone. 
+
+rclone sync ~/BaseSpace_Data/ gdrive:BaseSpace_Data --progress
+
+#Use this to update the files for backup
+rsync --update  --exclude --progress "anaconda3" /stg1/data2/kanishk/ kanishkasthana@emergence.ucsd.edu:/Volumes/Expansion
+#Backup files using Rsync and then use instructions in chronoseq tools to restore anaconda using the yml files. Its faster than trying to copy.
+
+#Use this to backup files to a new location for the first time:
+rsync -avuP  --exclude "anaconda3" /stg1/data2/kanishk/ kanishkasthana@emergence.ucsd.edu:/Volumes/Expansion/
+
+#Use this to backup sequencing data. This is the most important folder to backup you can ignore everything else if you want.
+rsync -avuP /stg1/data2/kanishk/BaseSpace_Data/ kanishkasthana@emergence.ucsd.edu:/Volumes/Expansion/BaseSpace_Data/
+
+#To activate the main environment we use for running our scripts
+conda activate r
+conda deactivate
+
+# For installing stuff use mamba
+mamba install -c channel_name package_name
+
+#Install Basespace
+https://developer.basespace.illumina.com/docs/content/documentation/cli/cli-overview 
+#For getting data from Basespace
+bs list datasets
+bs list projects
+bs download dataset -i dataset_id --extension=fastq.gz -o ~/BaseSpace_Data/Name_of_Project
+bs download project -i <ProjectID> -o <output>
+
+#How to subsample from a sam file. Do conda activate smtls before running this.
+samtools view -h -s 0.3 -b ~/mixedHumanMouse/Media_Optimization_Library3/Media_Optimization_Library3.aligned.sorted.merged.tagged.sub_corrected.syn_corrected.bam > ~/mixedHumanMouse/Media_Optimization_Library3.aligned.sorted.merged.tagged.sub_corrected.syn_corrected.sample_equal_to_lib_2.bam
+
+#How to backup your conda environment(For example for r-analysis environment:
+conda env export -n r-analysis > r-analysis.env.yml
+
+#Log memory usage for a specific process using this command:
+top -d 1 -b |grep 2276999 >>somefile 
+
+#How to generate StarGenomeIndex for PE150
+STAR   --runMode genomeGenerate   --runThreadN 8   --genomeDir /stg1/data2/kanishk/mm10/starGenomeIndex   --genomeFastaFiles /stg1/data2/kanishk/mm10/mm10.fasta      --sjdbGTFfile /stg1/data2/kanishk/mm10/mm10.gtf   --sjdbOverhang 149
+
+#Get Disk Capacity for Scratch
+cd /scratch
+df -h
+
+#Check if two files are the same or not.
+cmp --silent $old $new || echo "files are different"
+
+#Parallel Compression of Data use pigz
+pigz ~/BaseSpace_Data/DROPSEQ_COMPARISON/DROPSEQ_ORIGINAL_SPECIES_MIXING_DATA/100_STAMP_SPECIES_MIX/SRR1748412_1.fastq
+
+# How to store a credential with Git
+git config --global credential.helper store

@@ -1,0 +1,51 @@
+export http_proxy="webproxy.ucsd.edu:3128"
+export https_proxy=$http_proxy
+export HTTP_PROXY=$http_proxy
+export HTTPS_PROXY=$http_proxy
+export ftp_proxy=$http_proxy
+export PATH=/opt/wangcluster/git/2.12.1/bin/:$PATH
+export PATH=/stg1/data2/kanishk/bin/:$PATH
+export PATH=/stg1/data2/kanishk/Drop-seq_tools-2.4.0/:$PATH
+export HOME2=/stg3/data1/kanishk2/
+export HOME=/stg1/data2/kanishk/
+
+function startJupyter(){
+    jupyter lab --no-browser --port=$1
+}
+
+function clusterInfo(){
+    sinfo -N -l
+}
+
+function jobList(){
+    squeue
+}
+
+function startBash(){
+    srun -w $1 --exclusive --mem=0 --pty bash
+}
+
+function getScratchCapacity(){
+    cur_dir=$(pwd)
+    cd /scratch
+    df -h
+    cd $cur_dir
+}
+
+
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/stg1/data2/kanishk/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/stg1/data2/kanishk/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/stg1/data2/kanishk/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/stg1/data2/kanishk/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

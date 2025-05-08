@@ -1,0 +1,6 @@
+/home/kanishk/chrono-seq-tools
+compute-1-1
+Tue Feb  8 16:12:40 PST 2022
+usage: ChronoSeqPipeline.py [-h] READ1_FASTQ READ2_FASTQ SAMPLE_DIRECTORY_PATH SAMPLE_NAME
+ChronoSeqPipeline.py: error: argument SAMPLE_DIRECTORY_PATH: This directory doesn't exit. Try another path or please create this directory before running again.
+Tue Feb  8 16:12:40 PST 2022

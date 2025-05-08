@@ -1,0 +1,156 @@
+#CHANGE THESE BEFORE YOU RUN THE SCRIPT:
+dropseq_path="/stg1/data2/kanishk/Drop-seq_tools-2.4.0/" #Absolute Path for Dropseq tools directory. Version 2.4.0 for the development of this Pipeline
+
+#This is local storage on the compute node on which the code is running. Usually and SSD and Generally much faster than running it on a magnetic hard drive on the cluster.
+#If you have a lot of datasets you are running in parallel, its important to do use scratch to prevent a slow down or your script from crashing.
+#Sometimes also /TMP or /Temp. Check you node to see what the name of this directory is. This drive is generally erased after your session/job.
+scratch_directory="/scratch"
+#Global Variable that removes Intermediate Files if you don't want them to be stored.
+global remove_intermediates
+remove_intermediates=True
+#This will copy the needed files to Scratch and then do all the operations in Scratch. Then copy back the final files to the directory path provided.
+#Scratch on a SLURM node is generally an SSD so I/O operations are much faster. Otherwise this can be a bottleneck for the pipeline especially for Large Datasets.
+global copy_to_scratch
+copy_to_scratch=True
+#We need to prevent multiple reads and writes from the Storage server at the same time if we are using scratch
+#Please execute StartLock.py in a separate terminal on the same different compute node or a different node accessible by the other nodes running this script as a job. Use either the hostname or IP address of the node running the StartLock.py script. This is especially useful if you want to run multiple jobs at the same time stored on the same storage server but you don't want too many multiple requests for I/O from the server at the same time. Once the data is copied to or from scratch the pipeline should run independently or other jobs/instances.
+ip_or_hostname_for_remote_lock="compute-10"
+##############################################################################################################
+
+
+import subprocess
+import shlex
+import os
+import sys
+import argparse
+import shutil
+from datetime import datetime,timedelta
+global lock
+from multiprocessing.managers import BaseManager
+from threading import Lock
+class LockManager(BaseManager):
+    pass 
+LockManager.register("getLock")
+manager = LockManager(address=(ip_or_hostname_for_remote_lock, 55442), authkey=b'Lock')
+
+#For writing output to the stdout in realtime
+def write(*something):
+    print(*something)
+    sys.stdout.flush()
+    
+def parse_file(input_filename):
+    if not os.path.isfile(input_filename):
+        raise argparse.ArgumentTypeError("File does not exist. Please use a valid file path.")
+    return(input_filename)
+
+parser=argparse.ArgumentParser(description="Script for Getting Counts Data for Making the Mixed-Species Plot")
+parser.add_argument("INPUT_FILE",help="Absolute path of Substitution and Synthesis Error corrected BAM file for your Sample/Experiment", type=parse_file)
+parser.add_argument("BARCODES_FILE",help="Absolute path of the file containing the list of Barcodes for making the mixed species plot. Run getTopBarcodes.py to get this file.",type=parse_file)
+args=parser.parse_args()
+write(args)
+
+input_filename=args.INPUT_FILE
+barcodes_file=args.BARCODES_FILE
+sample_directory_path=os.path.dirname(input_filename)
+sample_directory_path=os.path.expanduser(sample_directory_path) #Getting Full Path 
+
+#Storing Original Values for Later Use
+original_sample_directory_path=sample_directory_path
+original_input_filename=input_filename
+original_barcodes_file=barcodes_file
+
+#Creates fresh empty directory
+def make_dir(tmp_directory_path):
+    if os.path.isdir(tmp_directory_path):
+        shutil.rmtree(tmp_directory_path)
+        os.mkdir(tmp_directory_path)
+    else:
+        os.mkdir(tmp_directory_path)
+        
+#Copy a File to a New Directory Location and then get the latest Path
+def copy_to_new_location(original_path,new_directory):
+    fileName=os.path.basename(original_path)
+    new_path=new_directory+"/"+fileName
+    start_time=datetime.now()
+    write("Started Copying : ",fileName," at ",start_time)
+    shutil.copy(original_path,new_path) #Copy file
+    end_time=datetime.now()
+    time_taken=end_time-start_time
+    write("Finished Copying : ",fileName," at ",end_time)
+    write("Time Taken: ",time_taken)
+    return new_path
+
+def copy_directory_tree(original_directory,new_directory):
+    start_time=datetime.now()
+    write("Started Copying files to ",new_directory," at: ",start_time)
+    shutil.copytree(original_directory,new_directory,dirs_exist_ok=True)
+    end_time=datetime.now()
+    write("Finished Copying files to ",new_directory," at: ",end_time)
+    time_taken=end_time-start_time
+    write("Time Taken :",time_taken)
+    return new_directory
+
+def remove_file(filename):
+    if remove_intermediates:
+        os.remove(filename)
+        write("Deleted file: "+filename)
+        
+def remove_directory_tree(tmp_directory_path):
+    if os.path.isdir(tmp_directory_path):
+        shutil.rmtree(tmp_directory_path)
+        write("Deleted Directory: "+tmp_directory_path)
+        
+if copy_to_scratch:
+    manager.connect()
+    lock=manager.getLock()
+    sample_directory_path=scratch_directory+"/"+os.path.basename(sample_directory_path)
+    make_dir(sample_directory_path)
+    #Copying Files to newly created directories and getting their new name
+    if lock.acquire():
+        write("Lock Acquired Starting Copy to Scratch!")
+        input_filename=copy_to_new_location(input_filename,sample_directory_path)
+        barcodes_file=copy_to_new_location(barcodes_file,sample_directory_path)
+        lock.release()
+    
+#This function will run a line directly on the command line and will wait for it to execute before going 
+#to the next line
+def bash(command):
+    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    while True:
+        out = process.stdout.readline().decode()
+        if out == '' and process.poll() is not None:
+            break
+        if out:
+            write(out.strip())
+
+def getNewFileName(previousFileName,additional_tag):
+    newFileName=previousFileName.split('.')[0:-1]
+    newFileName=".".join(newFileName)+additional_tag
+    return(newFileName,previousFileName)
+
+#Making temporary Directory path. Also this will be removed at end of script if it still exists.
+temporary_directory_path=sample_directory_path+"/TMP/"            
+make_dir(temporary_directory_path)
+
+##############################################################################################################
+
+OutputFileName,previousFileName=getNewFileName(input_filename,".dge.txt.gz")
+summaryFileName=OutputFileName+".summary.txt"
+bash(dropseq_path+"/DigitalExpression I="+input_filename+" O="+OutputFileName+" SUMMARY="+summaryFileName+" CELL_BC_FILE="+barcodes_file+" TMP_DIR="+temporary_directory_path)
+
+##############################################################################################################
+#Getting Rid of temporary directory 
+remove_directory_tree(temporary_directory_path)
+
+if copy_to_scratch and original_input_filename!=input_filename:
+    remove_file(input_filename)
+
+if copy_to_scratch and original_barcodes_file!=barcodes_file:
+    remove_file(barcodes_file)
+    
+#Copying all files still left in the scratch directory
+if copy_to_scratch and lock.acquire() and original_sample_directory_path!=sample_directory_path:
+    write("Lock Acquired Copying Final Files Back to Storage Server!")
+    copy_directory_tree(sample_directory_path,original_sample_directory_path)
+    remove_directory_tree(sample_directory_path) #Clean up scratch not automatically removed on our server.
+    lock.release()
