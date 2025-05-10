@@ -25,7 +25,7 @@ These scripts are used in conjuction with Dropseq tools and picard to get the Ti
     + If you don't want this behavior enabled then just set the ```copy_to_scratch``` variable to ```False```.
     + You will need to run the [StartLock.py](StartLock.py) script on one of the Compute Nodes to enable this feature. This way all the scripts on the batch job know they have to talk to this Compute Node to release or capture the Lock. You also need to specify this Compute node in your script by changing the value in the ```ip_or_hostname_for_remote_lock``` variable.
 + Once everything above has been sorted, you can generate the Digital Gene Expression Matrices for your sequencing data by running the following Scripts in order:
-    1. [ChronoSeqPipelineNoCorrectionTimeTag.py](ChronoSeqPipelineNoCorrection.py)
+    1. [ChronoSeqPipelineNoCorrectionTimeTagChronoV5.py](ChronoSeqPipelineNoCorrectionTimeTagChronoV5.py)
     2. [getTopBarcodes.py](getTopBarcodes.py)
     3. [GetDGE.py](GetDGE.py) or [MakeMixedSpeciesPlot.py](MakeMixedSpeciesPlot.py)
 > Run these Scripts inside a SBATCH script if using SLURM. Also remember to activate your environment if its different from your base environment. This example [SBATCH Script](ExampleScriptChronoSeqPipeline_SBATCH_SLURM.sh) should help.
