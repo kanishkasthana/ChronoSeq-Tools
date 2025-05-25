@@ -1,6 +1,6 @@
 #CHANGE THESE BEFORE YOU RUN THE SCRIPT:
 dropseq_path="/stg1/data2/kanishk/Drop-seq_tools-2.4.0/" #Absolute Path for Dropseq tools directory. Version 2.4.0 for the development of this Pipeline
-
+chronoseq_path="/stg1/data2/kanishk/ChronoSeq-Tools/"
 #This is local storage on the compute node on which the code is running. Usually and SSD and Generally much faster than running it on a magnetic hard drive on the cluster.
 #If you have a lot of datasets you are running in parallel, its important to do use scratch to prevent a slow down or your script from crashing.
 #Sometimes also /TMP or /Temp. Check you node to see what the name of this directory is. This drive is generally erased after your session/job.
@@ -14,7 +14,7 @@ global copy_to_scratch
 copy_to_scratch=True
 #We need to prevent multiple reads and writes from the Storage server at the same time if we are using scratch
 #Please execute StartLock.py in a separate terminal on the same different compute node or a different node accessible by the other nodes running this script as a job. Use either the hostname or IP address of the node running the StartLock.py script. This is especially useful if you want to run multiple jobs at the same time stored on the same storage server but you don't want too many multiple requests for I/O from the server at the same time. Once the data is copied to or from scratch the pipeline should run independently or other jobs/instances.
-ip_or_hostname_for_remote_lock="compute-10"
+ip_or_hostname_for_remote_lock="compute-1"
 ##############################################################################################################
 
 
@@ -137,6 +137,9 @@ make_dir(temporary_directory_path)
 OutputFileName,previousFileName=getNewFileName(input_filename,".dge.txt.gz")
 summaryFileName=OutputFileName+".summary.txt"
 bash(dropseq_path+"/DigitalExpression I="+input_filename+" O="+OutputFileName+" SUMMARY="+summaryFileName+" CELL_BC_FILE="+barcodes_file+" TMP_DIR="+temporary_directory_path)
+
+TimeTagsFileName,previousFileName=getNewFileName(input_filename,".time_tags.csv")
+bash("python "+chronoseq_path+"/getCombinedDGEWithTimeTags.py "+TimeTagsFileName+" "+OutputFileName)
 
 ##############################################################################################################
 #Getting Rid of temporary directory 
