@@ -1,15 +1,12 @@
 # ChronoSeq Tools
 
 These scripts are used in conjuction with Dropseq tools and picard to get the Time tags and  Digital Gene Expression Matrices for ChronoSeq data. Please follow the instructions below to get started:
-
-+ Please download:
-    + And unzip [Drop-Seq Tools](https://github.com/broadinstitute/Drop-seq/releases/download/v2.4.0/Drop-seq_tools-2.4.0.zip)  
-    + The [Picard](https://github.com/broadinstitute/picard/releases/download/2.23.9/picard.jar) jar file.
-
 + Download and install [Anaconda](https://www.anaconda.com/download) for your computing environment.
 + The environment yml files can be found in the [config_files](config_files) folder. Please create an environment identical to [chronoseqTools.env.yml](config_files/chronoseqTools.env.yml) [using the file](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
 + [Activate the environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment) you just created. Now you can run the scripts in this repo.
-> Optional Note: [This page](https://docs.icer.msu.edu/Using_conda/) or [this page](https://bioinformatics.uef.fi/guides/slurm/anaconda) might be helpful if you are running conda on [SLURM](https://slurm.schedmd.com/documentation.html).
++ Please download:
+    + And unzip [Drop-Seq Tools](https://github.com/broadinstitute/Drop-seq/releases/download/v2.4.0/Drop-seq_tools-2.4.0.zip)  
+    + The [Picard](https://github.com/broadinstitute/picard/releases/download/2.23.9/picard.jar) jar file.
 + Every script has a help prompt. You can get the help prompt by running:``` python <script_name> -h ``` 
 > Note: Please change the settings and paths at the top of each script before you run the script. You can find these settings above a long line of ###### symbols before the import statements.
 + You will need to download the prepared alignment data for Drop-seq before you can run the pipeline from https://mccarrolllab.org/dropseq/ under "Data Resources".
