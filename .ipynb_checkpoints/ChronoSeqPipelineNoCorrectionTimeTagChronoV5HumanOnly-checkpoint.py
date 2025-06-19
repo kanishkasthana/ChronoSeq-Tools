@@ -173,7 +173,7 @@ def getNewFileName(previousFileName,additional_tag):
 
 #Merging Both Reads into a Single File:
 OutputFileName=sample_directory_path+"/"+sample_name+"_unaligned.bam"
-#bash("java -Xmx4g -jar "+picard_path+" FastqToSam F1="+FastQFileR1+" F2="+FastQFileR2+ " O="+OutputFileName+" SM="+sample_name+" TMP_DIR="+temporary_directory_path)
+bash("java -Xmx4g -jar "+picard_path+" FastqToSam F1="+FastQFileR1+" F2="+FastQFileR2+ " O="+OutputFileName+" SM="+sample_name+" TMP_DIR="+temporary_directory_path)
 if copy_to_scratch and FastQFileR1!=original_FastQFileR1 and FastQFileR2!=original_FastQFileR2:
     unconditionally_remove_file(FastQFileR1)
     unconditionally_remove_file(FastQFileR2)
