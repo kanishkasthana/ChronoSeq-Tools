@@ -1,17 +1,17 @@
 #CHANGE THESE BEFORE YOU RUN THE SCRIPT:
-dropseq_path="/stg1/data2/kanishk/Drop-seq_tools-2.4.0/" #Absolute Path for Dropseq tools directory. Version 2.4.0 for the development of this Pipeline
-chronoseq_path="/stg1/data2/kanishk/ChronoSeq-Tools/"
+dropseq_path="/new-stg/home/kanishk2/Drop-seq_tools-2.4.0/" #Absolute Path for Dropseq tools directory. Version 2.4.0 for the development of this Pipeline
+chronoseq_path="/new-stg/home/kanishk2/ChronoSeq-Tools/"
 #This is local storage on the compute node on which the code is running. Usually and SSD and Generally much faster than running it on a magnetic hard drive on the cluster.
 #If you have a lot of datasets you are running in parallel, its important to do use scratch to prevent a slow down or your script from crashing.
 #Sometimes also /TMP or /Temp. Check you node to see what the name of this directory is. This drive is generally erased after your session/job.
 scratch_directory="/scratch"
 #Global Variable that removes Intermediate Files if you don't want them to be stored.
 global remove_intermediates
-remove_intermediates=True
+remove_intermediates=False
 #This will copy the needed files to Scratch and then do all the operations in Scratch. Then copy back the final files to the directory path provided.
 #Scratch on a SLURM node is generally an SSD so I/O operations are much faster. Otherwise this can be a bottleneck for the pipeline especially for Large Datasets.
 global copy_to_scratch
-copy_to_scratch=True
+copy_to_scratch=False
 #We need to prevent multiple reads and writes from the Storage server at the same time if we are using scratch
 #Please execute StartLock.py in a separate terminal on the same different compute node or a different node accessible by the other nodes running this script as a job. Use either the hostname or IP address of the node running the StartLock.py script. This is especially useful if you want to run multiple jobs at the same time stored on the same storage server but you don't want too many multiple requests for I/O from the server at the same time. Once the data is copied to or from scratch the pipeline should run independently or other jobs/instances.
 ip_or_hostname_for_remote_lock="compute-1"
