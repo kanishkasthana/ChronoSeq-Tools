@@ -21,7 +21,7 @@ def parse_file(input_filename):
     return(input_filename)
 
 parser=argparse.ArgumentParser(description="Script to get a list of all Cell Barcodes and their counts in the BAM file. Barcodes are listed in descending order.")
-parser.add_argument("INPUT_FILENAME",help="BAM file after correcting for Subsitution and Synthesis Errors", type=parse_file)
+parser.add_argument("INPUT_FILENAME",help="BAM file with merged tags after alignment", type=parse_file)
 parser.add_argument("OUTPUT_FILENAME",help="Filename for Compressed output. Please suffix filename with .gz to avoid confusion.",type=str)
 args=parser.parse_args()
 write(args)
