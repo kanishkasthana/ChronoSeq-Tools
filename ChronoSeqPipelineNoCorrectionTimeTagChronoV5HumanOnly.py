@@ -15,11 +15,11 @@ chronoseq_path="/new-stg/home/kanishk2/ChronoSeq-Tools/" #Absolute Path for Chro
 scratch_directory="/scratch"
 #Global Variable that removes Intermediate Files if you don't want them to be stored.
 global remove_intermediates
-remove_intermediates=False
+remove_intermediates=True
 #This will copy the needed files to Scratch and then do all the operations in Scratch. Then copy back the final files to the directory path provided.
 #Scratch on a SLURM node is generally an SSD so I/O operations are much faster. Otherwise this can be a bottleneck for the pipeline especially for Large Datasets.
 global copy_to_scratch
-copy_to_scratch=False
+copy_to_scratch=True
 #We need to prevent multiple reads and writes from the Storage server at the same time if we are using scratch
 #Please execute StartLock.py in a separate terminal on the same different compute node or a different node accessible by the other nodes running this script as a job. Use either the hostname or IP address of the node running the StartLock.py script. This is especially useful if you want to run multiple jobs at the same time stored on the same storage server but you don't want too many multiple requests for I/O from the server at the same time. Once the data is copied to or from scratch the pipeline should run independently or other jobs/instances.
 ip_or_hostname_for_remote_lock="compute-11"
