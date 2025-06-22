@@ -240,7 +240,7 @@ remove_file(unaligned_bam)
 #Tagging Reads with Gene Functional information
 OutputFileName,previousFileName=getNewFileName(OutputFileName,".tagged.bam")
 bash(dropseq_path+"/TagReadWithGeneFunction INPUT="+previousFileName+" OUTPUT="+OutputFileName+" ANNOTATIONS_FILE="+refFlat+" TMP_DIR="+temporary_directory_path)
-#remove_file(previousFileName)
+remove_file(previousFileName)
 
 #Correcting Substitution Errors
 #OutputFileName,previousFileName=getNewFileName(OutputFileName,".sub_corrected.bam")
