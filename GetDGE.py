@@ -14,7 +14,7 @@ global copy_to_scratch
 copy_to_scratch=True
 #We need to prevent multiple reads and writes from the Storage server at the same time if we are using scratch
 #Please execute StartLock.py in a separate terminal on the same different compute node or a different node accessible by the other nodes running this script as a job. Use either the hostname or IP address of the node running the StartLock.py script. This is especially useful if you want to run multiple jobs at the same time stored on the same storage server but you don't want too many multiple requests for I/O from the server at the same time. Once the data is copied to or from scratch the pipeline should run independently or other jobs/instances.
-ip_or_hostname_for_remote_lock="compute-11"
+ip_or_hostname_for_remote_lock="compute-3"
 ##############################################################################################################
 
 
