@@ -37,7 +37,7 @@ parser.add_argument("-e","--EXPORT_PLOT", help="Boolean Value for exporting plot
 args=parser.parse_args()
 
 filename=args.FILENAME
-outFilename=filename+"top_barcodes.txt"
+outFilename=filename+".top_barcodes.txt"
 
 if args.NUM_PLOT is not None:
     num_cells=args.NUM_PLOT
