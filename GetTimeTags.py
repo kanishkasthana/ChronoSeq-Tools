@@ -29,7 +29,7 @@ def check_ttc(input_tt):
     return value
 
 parser=argparse.ArgumentParser(description="Script to get the Corrected Time-Tags for Cell Barcodes. Please run CorrectSubstitutionErrors.py and CorrectSynthesisErrors.py before running this script.")
-parser.add_argument("INPUT_FILENAME",help="Aligned Merged, Gene labeled ,Sub and Syn Error Corrected BAM file", type=parse_file)
+parser.add_argument("INPUT_FILENAME",help="Aligned Merged, Gene labeled , optionally Sub and Syn Error Corrected BAM file", type=parse_file)
 parser.add_argument("OUTPUT_FILENAME",help="Please enter a Valid Path for the output table with the Barcodes and Time-Tags.",type=str)
 parser.add_argument("-ttc","--MIN_TTC", help="Minimum Time Tag count detected per barcode to be considered for Time Tag calculation. Default Value is 20.",type=check_ttc)
 args=parser.parse_args()
